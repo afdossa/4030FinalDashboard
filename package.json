@@ -6,7 +6,7 @@
   "scripts": {
     "start": "serve",
     "predeploy": "npm run build",
-    "deploy": "node deploy.js",
+    "deploy": "gh-pages -d .",
     "build": "echo 'No build step required for static D3 project'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
