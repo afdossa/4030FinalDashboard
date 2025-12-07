@@ -6,7 +6,7 @@
   "scripts": {
     "start": "serve",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d .",
+    "deploy": "node deploy-clean.js",
     "build": "echo 'No build step required for static D3 project'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/afdossa/4030FinalDashboard.git"
+    "url": "https://github.com/afdossa/4030FinalDashboard.git"
   },
   "bugs": {
     "url": "https://github.com/afdossa/4030FinalDashboard/issues"
