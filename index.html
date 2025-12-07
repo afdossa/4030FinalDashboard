@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Real Estate Dashboard</title>
+    <style>
+        /* General Layout and Background */
+        body {
+            background-color: #1f2937; /* bg-gray-900 */
+            color: #d1d5db; /* text-gray-100 */
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #dashboard-root {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* Chart Containers */
+        .chart-section {
+            background-color: rgba(31, 41, 55, 0.5); /* bg-gray-800/50 */
+            border: 1px solid #374151; /* border-gray-700 */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+        #main-layout {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            flex-grow: 1;
+        }
+        /* Chart Typography */
+        .chart-title {
+            color: #e5e7eb;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        /* Axis and Gridline Styling for D3 SVGs */
+        .chart-container .x-axis path,
+        .chart-container .y-axis path,
+        .dumbbell-chart-group .x-axis path,
+        .dumbbell-chart-group .y-axis path {
+            stroke: #444;
+        }
+        .chart-container .x-axis line,
+        .chart-container .y-axis line,
+        .dumbbell-chart-group .x-axis line,
+        .dumbbell-chart-group .y-axis line,
+        .grid line {
+            stroke: #444;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+<div id="dashboard-root">
+    <header>
+        <div>
+            <h1 style="font-size: 1.875rem; font-weight: 700; color: #f97316;">Real Estate Dashboard</h1>
+            <p style="color: #9ca3af; margin-top: 0.25rem;">Interactive Market Analysis System</p>
+        </div>
+        <div style="font-size: 0.875rem; color: #6b7280;">
+            Data Source: CT Real Estate Sales
+        </div>
+    </header>
+
+    <main id="main-layout">
+        <section class="chart-section" style="grid-column: span 12 / span 12; min-height: 800px;">
+            <div class="mb-4">
+                <h2 class="text-xl font-bold text-gray-200">Sale Amount vs Assessed Value by Property Type</h2>
+                <p class="text-sm text-gray-400">Click a legend item to filter. Click a point to select it.</p>
+            </div>
+
+            <div id="scatter-plot-container" style="flex-grow: 1;">
+            </div>
+
+            <div id="scatter-plot-legend" style="padding-top: 20px; text-align: center;"></div>
+        </section>
+
+        <section class="chart-section" style="grid-column: span 6 / span 6; min-height: 450px;">
+            <h2 class="chart-title">Average Assessed Values and Sales Values by Property Type</h2>
+            <div id="dumbbell-chart-container" style="flex-grow: 1;">
+            </div>
+            <div id="dumbbell-legend-container" style="display: flex; justify-content: center; margin-top: 10px;"></div>
+        </section>
+
+        <section class="chart-section" style="grid-column: span 6 / span 6; min-height: 450px;">
+            <h2 id="town-comparison-chart-title" class="chart-title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">
+                Town vs. Market Comparison (All Towns)
+            </h2>
+            <div id="town-comparison-chart-container" style="flex-grow: 1;">
+            </div>
+
+            <div class="flex justify-center mt-4 space-x-6" id="town-comparison-legend">
+                <div class="flex items-center text-sm text-gray-400">
+                    <svg width="10" height="10" class="mr-2"><circle r="4" cx="5" cy="5" fill="cornflowerblue" /></svg>
+                    <span>o - All Data</span>
+                </div>
+                <div class="flex items-center text-sm text-gray-400">
+                    <svg width="10" height="10" class="mr-2"><circle r="4" cx="5" cy="5" fill="darkviolet" /></svg>
+                    <span class="legend-town-text-span">o - Town Name</span>
+                </div>
+                <div class="flex items-center text-sm text-gray-400">
+                    <svg width="10" height="10" class="mr-2"><circle r="4" cx="5" cy="5" fill="yellow" stroke="black" stroke-width="1" /></svg>
+                    <span>o - Selected Point</span>
+                </div>
+            </div>
+
+            <p id="town-info-text" class="text-sm text-gray-500 mt-2">
+                Click a point in the scatter plot to select a town and see its comparison line.
+            </p>
+        </section>
+    </main>
+
+    <footer style="margin-top: 2rem; text-align: center; color: #6b7280; font-size: 0.875rem;">
+        &copy; 2025 Real Estate Analytics. All rights reserved.
+    </footer>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<script src="scatterPlot.js"></script>
+<script src="propertyTypeDumbbell.js"></script>
+<script src="townComparisonChart.js"></script>
+
+<script src="index.js"></script>
+</body>
+</html>

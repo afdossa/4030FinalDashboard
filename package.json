@@ -1,0 +1,20 @@
+{
+  "name": "d3-project",
+  "version": "1.0.0",
+  "description": "A simple D3 project.",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve",
+    "build": "echo \"No build step defined, serving files directly.\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "d3",
+    "visualization"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serve": "^14.2.3"
+  }
+}
