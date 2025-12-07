@@ -19,7 +19,7 @@ Once you are satisfied with the result update your code on Github and add a scre
 
 ### Step 3
 
-Uncomment the line `<!-- <script src="TownComparisonChart.js"></script> -->` from your `index.html` file and open `TownComparisonChart.js`.
+Uncomment the line `<!-- <script src="townComparisonChart.js"></script> -->` from your `index.html` file and open `townComparisonChart.js`.
 Here we are trying to draw a very small hiearchy starting from a given dataset already stored in the variable `family`.
 
 Take a look at the dataset first. You will notice a clear paret-child relationship which should appear in our tree visualization.
