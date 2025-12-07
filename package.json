@@ -16,5 +16,16 @@
   "license": "ISC",
   "dependencies": {
     "serve": "^14.2.3"
-  }
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afdossa/4030FinalDashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/afdossa/4030FinalDashboard/issues"
+  },
+  "homepage": "https://github.com/afdossa/4030FinalDashboard#readme"
 }
