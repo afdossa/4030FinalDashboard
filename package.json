@@ -5,7 +5,9 @@
   "main": "index.html",
   "scripts": {
     "start": "serve",
-    "build": "echo \"No build step defined, serving files directly.\"",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d . -x node_modules --dotfiles",
+    "build": "echo 'No build step required for static D3 project'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -27,5 +29,5 @@
   "bugs": {
     "url": "https://github.com/afdossa/4030FinalDashboard/issues"
   },
-  "homepage": "https://github.com/afdossa/4030FinalDashboard#readme"
+  "homepage": "https://afdossa.github.io/4030FinalDashboard/"
 }
