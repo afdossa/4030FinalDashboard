@@ -1,16 +1,16 @@
 // scatterPlot.js
 
 const SCATTER_MARGIN = { top: 20, right: 40, bottom: 50, left: 80 };
-const SCATTER_HEIGHT = 750 - SCATTER_MARGIN.top - SCATTER_MARGIN.bottom;
+const SCATTER_HEIGHT = 250 - SCATTER_MARGIN.top - SCATTER_MARGIN.bottom;
 
 // Fixed color palette (Matches the TSX)
 const SCATTER_COLORS = {
-    "Residential": "#8884d8", // Purple
-    "Commercial": "#82ca9d",  // Greenish
-    "Industrial": "#ffc658",  // Yellow
-    "Apartments": "#ff7300",  // Orange
-    "Public Utility": "#0088FE", // Blue
-    "Vacant Land": "#FFBB28", // Gold
+    "Residential":   "#8884d8", // purple
+    "Commercial":    "#82ca9d", // green
+    "Industrial":    "#FFC658", // yellow (actual yellow!)
+    "Apartments":    "#FF7300", // orange
+    "Public Utility":"#0088FE", // blue
+    "Vacant Land":   "#AA336A"  // magenta (strong contrast)
 };
 
 // Global D3 elements and State
@@ -337,7 +337,9 @@ const drawScatterLegend = (groupedData) => {
             updateScatterPlot(scatterSelectedSale);
         })
         .html(d => `
-            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${SCATTER_COLORS[d]}; margin-right: 5px;"></span>
+            <svg width="10" height="10" style="margin-right: 5px;">
+                <circle r="4" cx="5" cy="5" fill="${SCATTER_COLORS[d]}" />
+            </svg>
             ${d}
         `);
 };

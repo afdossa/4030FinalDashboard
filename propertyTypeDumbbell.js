@@ -2,7 +2,7 @@
 
 const DUMBBELL_MARGIN = { top: 20, right: 30, bottom: 50, left: 80 };
 const DUMBBELL_WIDTH = 550 - DUMBBELL_MARGIN.left - DUMBBELL_MARGIN.right;
-const DUMBBELL_HEIGHT = 400 - DUMBBELL_MARGIN.top - DUMBBELL_MARGIN.bottom;
+const DUMBBELL_HEIGHT = 250 - DUMBBELL_MARGIN.top - DUMBBELL_MARGIN.bottom;
 const DUMBBELL_BAR_WIDTH = 2; // Width of the connecting line
 
 // Global D3 elements for update access
@@ -164,9 +164,11 @@ const updatePropertyTypeDumbbell = (data, selectedSale) => {
     selectedLines.join(
         enter => enter.append("line")
             .attr("class", "sel-line")
-            .attr("stroke", "#22c55e")
+            .attr("stroke", d => SCATTER_COLORS[d.name])
             .attr("stroke-width", 4),
-        update => update.transition().duration(500),
+        update => update
+            .attr("stroke", d => SCATTER_COLORS[d.name])
+            .transition().duration(500),
         exit => exit.remove()
     )
         .attr("x1", d => dumbbellXScale(d.name) + dumbbellXScale.bandwidth() / 2)
@@ -174,7 +176,8 @@ const updatePropertyTypeDumbbell = (data, selectedSale) => {
         .attr("y1", d => dumbbellYScale(d.selectedRange[0]))
         .attr("y2", d => dumbbellYScale(d.selectedRange[1]));
 
-    // --- 4. Selected Point Dots (Comparison Bells) ---
+
+// --- 4. Selected Point Dots (Comparison Bells) ---
     const selectedDots = dumbbellChartGroup.selectAll(".sel-dot")
         .data(chartData.filter(d => d.selectedSale !== null).flatMap(d => [
             { type: d.name, value: d.selectedAssessed, key: `${d.name}-sel-assessed` },
@@ -185,19 +188,45 @@ const updatePropertyTypeDumbbell = (data, selectedSale) => {
         enter => enter.append("circle")
             .attr("class", "sel-dot")
             .attr("r", 5)
-            .attr("fill", "#22c55e")
-            .attr("stroke", "#1f2937") // Dark background stroke for visibility
+            .attr("fill", d => SCATTER_COLORS[d.type])
+            .attr("stroke", "#1f2937")
             .attr("stroke-width", 1.5)
-            .style("z-index", 10), // Ensures dot is on top
-        update => update.transition().duration(500),
+            .style("z-index", 10),
+        update => update
+            .attr("fill", d => SCATTER_COLORS[d.type])
+            .transition().duration(500),
         exit => exit.remove()
     )
         .attr("cx", d => dumbbellXScale(d.type) + dumbbellXScale.bandwidth() / 2)
         .attr("cy", d => dumbbellYScale(d.value));
 
-    // Optional: Add basic D3 Tooltip functionality (simplified version of CustomTooltip)
+
+
+// ---------------------------------------------------------------------
+// 🔥 SELECTED LEGEND UPDATE — START HERE
+// ---------------------------------------------------------------------
+    if (selectedSale) {
+        const selColor = SCATTER_COLORS[selectedSale.property_type];
+
+        d3.select("#dumbbell-selected-legend").style("display", "flex");
+
+        d3.select("#dumbbell-selected-legend-circle circle")
+            .attr("r", 4) // CONSISTENCY FIX: Standardize radius
+            .attr("fill", selColor);
+
+        d3.select("#dumbbell-selected-legend-label")
+            .text(`Selected (${selectedSale.property_type})`);
+    } else {
+        d3.select("#dumbbell-selected-legend").style("display", "none");
+    }
+// ---------------------------------------------------------------------
+// 🔥 SELECTED LEGEND UPDATE — END HERE
+// ---------------------------------------------------------------------
+
+// Optional: Add basic D3 Tooltip functionality (simplified version of CustomTooltip)
     addDumbbellTooltip(dumbbellSVG, dumbbellXScale, dumbbellYScale, chartData);
 };
+
 
 
 // --- Tooltip Functionality (Simplification of CustomTooltip) ---
@@ -268,8 +297,8 @@ const addDumbbellTooltip = (svg, xScale, yScale, chartData) => {
 const drawDumbbellLegend = () => {
     const legendData = [
         { label: 'Avg Assessed', color: '#60a5fa' },
-        { label: 'Avg Sales', color: '#c084fc' },
-        { label: 'Selected Point', color: '#22c55e' }
+        { label: 'Avg Sales',   color: '#c084fc' }
+        // Selected Point is handled dynamically in updatePropertyTypeDumbbell()
     ];
 
     const legendContainer = d3.select("#dumbbell-legend-container");
@@ -283,7 +312,9 @@ const drawDumbbellLegend = () => {
         .style("margin", "0 10px")
         .style("color", "#9ca3af")
         .html(d => `
-            <span style="width: 12px; height: 12px; border-radius: 50%; background-color: ${d.color}; margin-right: 8px; border: ${d.color === '#22c55e' ? '1px solid #1f2937' : 'none'};"></span>
+            <svg width="10" height="10" style="margin-right: 8px;">
+                <circle r="4" cx="5" cy="5" fill="${d.color}" />
+            </svg>
             ${d.label}
         `);
 };

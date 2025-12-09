@@ -17,12 +17,12 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            padding: 2rem;
+            padding: 1rem;
             max-width: 1400px;
             margin: 0 auto;
         }
         header {
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -32,7 +32,7 @@
             background-color: rgba(31, 41, 55, 0.5); /* bg-gray-800/50 */
             border: 1px solid #374151; /* border-gray-700 */
             border-radius: 0.75rem;
-            padding: 1.5rem;
+            padding: 1.0rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             min-height: 450px;
             display: flex;
@@ -71,18 +71,14 @@
 <div id="dashboard-root">
     <header>
         <div>
-            <h1 style="font-size: 1.875rem; font-weight: 700; color: #f97316;">Real Estate Dashboard</h1>
-            <p style="color: #9ca3af; margin-top: 0.25rem;">Interactive Market Analysis System</p>
-        </div>
-        <div style="font-size: 0.875rem; color: #6b7280;">
-            Data Source: CT Real Estate Sales
+            <h1 style="font-size: 1.0rem; font-weight: 700; color: #f97316;">Real Estate Dashboard</h1>
         </div>
     </header>
 
     <main id="main-layout">
-        <section class="chart-section" style="grid-column: span 12 / span 12; min-height: 800px;">
+        <section class="chart-section" style="grid-column: span 12 / span 12; min-height: 250px;">
             <div class="mb-4">
-                <h2 class="text-xl font-bold text-gray-200">Sale Amount vs Assessed Value by Property Type</h2>
+                <h2 class="text-base font-bold text-gray-200" style="font-size: 1.25rem;">Sale Amount vs Assessed Value by Property Type</h2>
                 <p class="text-sm text-gray-400">Click a legend item to filter. Click a point to select it.</p>
             </div>
 
@@ -92,33 +88,59 @@
             <div id="scatter-plot-legend" style="padding-top: 20px; text-align: center;"></div>
         </section>
 
-        <section class="chart-section" style="grid-column: span 6 / span 6; min-height: 450px;">
-            <h2 class="chart-title">Average Assessed Values and Sales Values by Property Type</h2>
-            <div id="dumbbell-chart-container" style="flex-grow: 1;">
+        <section class="chart-section" style="grid-column: span 6 / span 6; min-height: 200px;">
+            <h2 class="chart-title" style="font-size: 1.25rem;">Average Assessed Values and Sales Values by Property Type</h2>
+
+            <div id="dumbbell-chart-container"></div>
+
+            <div id="dumbbell-legend-container"
+                 style="display: flex; justify-content: center; margin-top: 10px;">
             </div>
-            <div id="dumbbell-legend-container" style="display: flex; justify-content: center; margin-top: 10px;"></div>
+
+            <div id="dumbbell-selected-legend"
+                 style="display: none; justify-content: center; margin-top: 8px;
+                align-items: center; gap: 6px; color: #9ca3af;">
+                <svg id="dumbbell-selected-legend-circle" width="10" height="10">
+                    <circle r="4" cx="5" cy="5" stroke="black" stroke-width="1" />
+                </svg>
+                <span id="dumbbell-selected-legend-label">Selected</span>
+            </div>
         </section>
 
-        <section class="chart-section" style="grid-column: span 6 / span 6; min-height: 450px;">
-            <h2 id="town-comparison-chart-title" class="chart-title" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">
+
+        <section class="chart-section" style="grid-column: span 6 / span 6; min-height: 250px;">
+            <h2 id="town-comparison-chart-title" class="chart-title" style="font-size: 1.25rem;">
                 Town vs. Market Comparison (All Towns)
             </h2>
             <div id="town-comparison-chart-container" style="flex-grow: 1;">
             </div>
 
-            <div class="flex justify-center mt-4 space-x-6" id="town-comparison-legend">
-                <div class="flex items-center text-sm text-gray-400">
-                    <svg width="10" height="10" class="mr-2"><circle r="4" cx="5" cy="5" fill="cornflowerblue" /></svg>
-                    <span>o - All Data</span>
+            <div id="town-comparison-legend"
+                 style="display: flex; flex-direction: row; justify-content: center; gap: 20px; margin-top: 10px;">
+
+                <div class="legend-item" style="display: flex; align-items: center; font-size: 0.875rem; color: #9ca3af;">
+                    <svg width="10" height="10" style="margin-right: 6px;">
+                        <circle r="4" cx="5" cy="5" fill="#b96a10" />
+                    </svg>
+                    <span>All Data</span>
                 </div>
-                <div class="flex items-center text-sm text-gray-400">
-                    <svg width="10" height="10" class="mr-2"><circle r="4" cx="5" cy="5" fill="darkviolet" /></svg>
-                    <span class="legend-town-text-span">o - Town Name</span>
+
+                <div class="legend-item" style="display: flex; align-items: center; font-size: 0.875rem; color: #9ca3af;">
+                    <svg width="10" height="10" style="margin-right: 6px;">
+                        <circle r="4" cx="5" cy="5" fill="#1e90ff" />
+                    </svg>
+                    <span class="legend-town-text-span">Town Name</span>
                 </div>
-                <div class="flex items-center text-sm text-gray-400">
-                    <svg width="10" height="10" class="mr-2"><circle r="4" cx="5" cy="5" fill="yellow" stroke="black" stroke-width="1" /></svg>
-                    <span>o - Selected Point</span>
+
+                <div id="selected-point-legend"
+                     class="legend-item"
+                     style="display: none; align-items: center; font-size: 0.875rem; color: #9ca3af;">
+                    <svg id="selected-point-legend-circle" width="10" height="10" style="margin-right: 6px;">
+                        <circle r="4" cx="5" cy="5" stroke="black" stroke-width="1" />
+                    </svg>
+                    <span id="selected-point-legend-label">Selected Point</span>
                 </div>
+
             </div>
 
             <p id="town-info-text" class="text-sm text-gray-500 mt-2">
@@ -128,7 +150,6 @@
     </main>
 
     <footer style="margin-top: 2rem; text-align: center; color: #6b7280; font-size: 0.875rem;">
-        &copy; 2025 Real Estate Analytics. All rights reserved.
     </footer>
 </div>
 

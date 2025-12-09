@@ -3,7 +3,7 @@
 // --- D3 Chart Configuration ---
 const TCC_MARGIN = { top: 20, right: 30, bottom: 50, left: 80 };
 const TCC_WIDTH = 550 - TCC_MARGIN.left - TCC_MARGIN.right;
-const TCC_HEIGHT = 400 - TCC_MARGIN.top - TCC_MARGIN.bottom;
+const TCC_HEIGHT = 250 - TCC_MARGIN.top - TCC_MARGIN.bottom;
 const ASSESSED_BIN_SIZE = 200000; // 200k bin size for x-axis
 
 // --- OUTLIER CAPS (REDUCED X-AXIS CAP) ---
@@ -74,7 +74,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
     // Update HTML elements (title and helper text)
     d3.select("#town-comparison-chart-title").text(`Town vs. Market Comparison (${selectedTown || 'All Towns'})`);
     d3.select("#town-info-text").text(selectedTown ? `Comparison for ${selectedTown}` : "Click a point in the scatter plot to select a town and see its comparison line.");
-    d3.select(".legend-town-text-span").text(`o - ${selectedTown || 'Town Name'}`);
+    d3.select(".legend-town-text-span").text(`${selectedTown || 'Town Name'}`);
 
 
     const svg = container.append("svg")
@@ -159,7 +159,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
         .style("fill", "#ddd")
         .text("Average Sale Value");
 
-    // --- Line Drawing (Unchanged) ---
+    // --- Line Drawing (3 CHANGES HERE) ---
     const lineGenerator = d3.line()
         .x(d => xScale(d.bin + ASSESSED_BIN_SIZE / 2))
         .y(d => yScale(d.average_sale_value))
@@ -168,7 +168,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
     chartGroup.append("path")
         .datum(allDataAggregated)
         .attr("fill", "none")
-        .attr("stroke", "cornflowerblue")
+        .attr("stroke", "#b96a10") // CHANGE 1: cornflowerblue -> #f97316 (Orange)
         .attr("stroke-width", 2)
         .attr("d", lineGenerator);
 
@@ -176,23 +176,27 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
         chartGroup.append("path")
             .datum(townDataAggregated)
             .attr("fill", "none")
-            .attr("stroke", "darkviolet")
+            .attr("stroke", "#1e90ff") // CHANGE 2: darkviolet -> #1e90ff (Blue)
             .attr("stroke-width", 3)
             .attr("d", lineGenerator);
     }
 
-    // --- Selected Point Highlight (WITH NaN FIX - Unchanged) ---
+    // --- Selected Point Highlight (1 CHANGE HERE) ---
+    // --- Selected Point Highlight ---
     if (currentSelectedSale) {
-        // Ensure the selectedSale is within the chart's bounds before calculating position
-        const isSaleInBounds = currentSelectedSale.assessed_value <= MAX_ASSESSED_VALUE_CAP &&
+
+        const isSaleInBounds =
+            currentSelectedSale.assessed_value <= MAX_ASSESSED_VALUE_CAP &&
             currentSelectedSale.sale_amount <= MAX_SALE_VALUE_CAP;
 
-        let xPos;
-        let yPos;
+        let xPos, yPos;
 
         if (isSaleInBounds) {
-            const selectedBin = Math.floor(currentSelectedSale.assessed_value / ASSESSED_BIN_SIZE) * ASSESSED_BIN_SIZE;
-            let highlightedPoint = townDataAggregated.find(d => d.bin === selectedBin);
+            const selectedBin =
+                Math.floor(currentSelectedSale.assessed_value / ASSESSED_BIN_SIZE) *
+                ASSESSED_BIN_SIZE;
+
+            const highlightedPoint = townDataAggregated.find(d => d.bin === selectedBin);
 
             if (highlightedPoint) {
                 xPos = xScale(highlightedPoint.bin + ASSESSED_BIN_SIZE / 2);
@@ -202,13 +206,13 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
                 yPos = yScale(currentSelectedSale.sale_amount);
             }
 
-            // CRITICAL FIX: Only draw if the coordinates are valid numbers
-            if (isFinite(yPos) && isFinite(xPos)) {
+            // Draw selected point if coordinates are valid
+            if (isFinite(xPos) && isFinite(yPos)) {
                 chartGroup.append("circle")
                     .attr("cx", xPos)
                     .attr("cy", yPos)
                     .attr("r", 5)
-                    .attr("fill", "yellow")
+                    .attr("fill", SCATTER_COLORS[currentSelectedSale.property_type])
                     .attr("stroke", "black")
                     .attr("stroke-width", 1)
                     .attr("class", "selected-point");
@@ -216,11 +220,27 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
                 console.warn(`Selected point skipped in Town Comparison Chart: Invalid coordinates.`);
             }
         }
+
+        // --- Update Legend for Selected Point ---
+        const selColor = SCATTER_COLORS[currentSelectedSale.property_type];
+
+        d3.select("#selected-point-legend")
+            .style("display", "flex");
+
+        d3.select("#selected-point-legend-circle circle")
+            .attr("fill", selColor);
+
+        d3.select("#selected-point-legend-label")
+            .text(`Selected (${currentSelectedSale.property_type})`);
+
+    } else {
+        // No selected sale → hide selected legend
+        d3.select("#selected-point-legend")
+            .style("display", "none");
     }
 }
 
 // --- Global Initialization/Update Functions (Required by index.js) ---
-
 function initializeTownComparisonChart(data, currentSelectedSale) {
     renderTownComparisonChart('#town-comparison-chart-container', data, currentSelectedSale);
 }
