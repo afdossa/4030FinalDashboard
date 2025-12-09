@@ -124,7 +124,7 @@ const initializeScatterPlot = (data, onPointClickCallback, initialSelectedSale) 
 
     // Axis Labels
     scatterSVG.append("text").attr("class", "x label").attr("text-anchor", "middle").attr("x", SCATTER_MARGIN.left + width / 2).attr("y", SCATTER_HEIGHT + SCATTER_MARGIN.top + SCATTER_MARGIN.bottom - 5).style("fill", "#9ca3af").text("Sales Value");
-    scatterSVG.append("text").attr("class", "y label").attr("text-anchor", "middle").attr("y", SCATTER_MARGIN.left - 40).attr("x", -SCATTER_HEIGHT / 2).attr("transform", "rotate(-90)").style("fill", "#9ca3af").text("Assessed Value");
+    scatterSVG.append("text").attr("class", "y label").attr("text-anchor", "middle").attr("y", SCATTER_MARGIN.left - 55).attr("x", -SCATTER_HEIGHT / 2).attr("transform", "rotate(-90)").style("fill", "#9ca3af").text("Assessed Value");
 
     // --- Draw Initial Data ---
     drawScatterLegend(scatterGroupData(data));

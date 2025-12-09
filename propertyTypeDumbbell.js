@@ -97,7 +97,29 @@ const initializePropertyTypeDumbbell = (data, selectedSale) => {
     const xAxis = d3.axisBottom(dumbbellXScale);
 
     dumbbellChartGroup.append("g").attr("class", "y-axis").call(yAxis).selectAll("text").attr("fill", "#ccc");
-    dumbbellChartGroup.append("g").attr("class", "x-axis").attr("transform", `translate(0, ${DUMBBELL_HEIGHT})`).call(xAxis).selectAll("text").attr("fill", "#ccc").style("text-anchor", "end").attr("transform", "rotate(-15)");
+    dumbbellChartGroup.append("g").attr("class", "x-axis").attr("transform", `translate(0, ${DUMBBELL_HEIGHT})`).call(xAxis).selectAll("text").attr("fill", "#ccc").style("text-anchor", "end").attr("transform", "rotate(0)");
+
+    // --- AXIS TITLES ---
+    dumbbellChartGroup.append("text")
+        .attr("class", "y-axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -DUMBBELL_HEIGHT / 2)
+        .attr("y", -DUMBBELL_MARGIN.left + 20)
+        .attr("fill", "#9ca3af")
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Dollar Value");
+
+    dumbbellChartGroup.append("text")
+        .attr("class", "x-axis-label")
+        .attr("x", DUMBBELL_WIDTH / 2)
+        .attr("y", DUMBBELL_HEIGHT + DUMBBELL_MARGIN.bottom - 10)
+        .attr("fill", "#9ca3af")
+        .style("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Property Type");
+
+
 
     // Gridlines (Horizontal)
     dumbbellChartGroup.append("g").attr("class", "grid y-grid").call(d3.axisLeft(dumbbellYScale).tickSize(-DUMBBELL_WIDTH).tickFormat(() => "")).selectAll(".tick line").attr("stroke", "#444");

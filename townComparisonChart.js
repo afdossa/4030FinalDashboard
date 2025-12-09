@@ -147,7 +147,8 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
         .attr("text-anchor", "middle")
         .attr("x", TCC_WIDTH / 2)
         .attr("y", TCC_HEIGHT + TCC_MARGIN.bottom - 5)
-        .style("fill", "#ddd")
+        .style("fill", "#9ca3af")
+        .style("font-size", "12px")
         .text("Average Assessed Value");
 
     chartGroup.append("text")
@@ -156,8 +157,10 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
         .attr("y", -TCC_MARGIN.left + 15)
         .attr("x", -TCC_HEIGHT / 2)
         .attr("transform", "rotate(-90)")
-        .style("fill", "#ddd")
+        .style("fill", "#9ca3af")
+        .style("font-size", "12px")
         .text("Average Sale Value");
+
 
     // --- Line Drawing (3 CHANGES HERE) ---
     const lineGenerator = d3.line()
