@@ -6,7 +6,7 @@ let selectedSale = null;
 
 // --- API Endpoint and Data Source ---
 const DATA_SOURCE_FILE = "test2.json";
-const SAMPLE_SIZE = 1000; // Limit the data points to 15,000 for performance
+const SAMPLE_SIZE = 100000; // Limit the data points to 15,000 for performance
 
 // --- Utility Functions (Simulating the App component's methods) ---
 

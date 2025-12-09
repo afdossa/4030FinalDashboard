@@ -22,6 +22,8 @@ let scatterRawData = [];
 let scatterActiveType = null; // Legend filter state
 let scatterOnPointClick; // Function passed from index.js
 let scatterSelectedSale = null;
+let scatterTooltipLayer;
+
 
 // --- Formatters (Matches the TSX) ---
 const scatterFormatCurrency = (value) => {
@@ -60,32 +62,43 @@ const initializeScatterPlot = (data, onPointClickCallback, initialSelectedSale) 
     scatterSelectedSale = initialSelectedSale;
 
     // 1. Setup SVG Container
-    scatterSVG = d3.select("#scatter-plot-container").append("svg")
-        .attr("width", "100%") // Use 100% width of container
+    scatterSVG = d3.select("#scatter-plot-container")
+        .append("svg")
+        .attr("width", "100%")
         .attr("height", SCATTER_HEIGHT + SCATTER_MARGIN.top + SCATTER_MARGIN.bottom);
 
-    const width = scatterSVG.node().getBoundingClientRect().width - SCATTER_MARGIN.left - SCATTER_MARGIN.right;
+    // --- CLEAN INITIAL SETUP ORDER ---
 
-
-    // --- 2. Define Clip Path to prevent points from drawing outside the axes ---
-    const clipId = "clip-scatter-area";
-
-    // Remove old chart and clip elements
+    // Remove old layers FIRST
     scatterSVG.selectAll(".chart-container").remove();
     scatterSVG.selectAll("defs").remove();
+    scatterSVG.selectAll(".tooltip-layer").remove();
 
-    // Define the clip area within the SVG <defs>
-    scatterSVG.append("defs").append("clipPath")
+    // Measure width AFTER clearing
+    const width = scatterSVG.node().getBoundingClientRect().width
+        - SCATTER_MARGIN.left
+        - SCATTER_MARGIN.right;
+
+    // Create clipPath
+    const clipId = "clip-scatter-area";
+
+    scatterSVG.append("defs")
+        .append("clipPath")
         .attr("id", clipId)
         .append("rect")
         .attr("width", width)
-        .attr("height", SCATTER_HEIGHT); // Clip to the exact chart dimensions
+        .attr("height", SCATTER_HEIGHT);
 
-    // Apply the clip path to the chart group
+    // Create chart group (clipped)
     scatterChartGroup = scatterSVG.append("g")
         .attr("class", "chart-container")
         .attr("transform", `translate(${SCATTER_MARGIN.left}, ${SCATTER_MARGIN.top})`)
-        .attr("clip-path", `url(#${clipId})`); // ADDED: Apply clip path here
+        .attr("clip-path", `url(#${clipId})`);
+
+    // Create tooltip layer (NOT clipped) - Retained for legacy, though unused by the new HTML logic
+    scatterTooltipLayer = scatterSVG.append("g")
+        .attr("class", "tooltip-layer")
+        .attr("transform", `translate(${SCATTER_MARGIN.left}, ${SCATTER_MARGIN.top})`);
 
 
     // --- 3. SCALES (LOGARITHMIC SCALE WITH PADDING) ---
@@ -125,6 +138,11 @@ const initializeScatterPlot = (data, onPointClickCallback, initialSelectedSale) 
     // Axis Labels
     scatterSVG.append("text").attr("class", "x label").attr("text-anchor", "middle").attr("x", SCATTER_MARGIN.left + width / 2).attr("y", SCATTER_HEIGHT + SCATTER_MARGIN.top + SCATTER_MARGIN.bottom - 5).style("fill", "#9ca3af").text("Sales Value");
     scatterSVG.append("text").attr("class", "y label").attr("text-anchor", "middle").attr("y", SCATTER_MARGIN.left - 55).attr("x", -SCATTER_HEIGHT / 2).attr("transform", "rotate(-90)").style("fill", "#9ca3af").text("Assessed Value");
+
+    // CRITICAL LAYERING FIX: Ensure data layers are on top of axes
+    scatterChartGroup.raise();
+    scatterTooltipLayer.raise();
+
 
     // --- Draw Initial Data ---
     drawScatterLegend(scatterGroupData(data));
@@ -231,87 +249,49 @@ const updateScatterPlot = (newSelectedSale) => {
             .attr("cx", d => scatterXScale(d.sale_amount))
             .attr("cy", d => scatterYScale(d.assessed_value)),
         exit => exit.remove()
-    );
+    )
+        .raise(); // Ensure the ring is on top of points within the chart group
 
-    // --- 3. Add/Remove Permanent Click Tooltip ---
-    const tooltipData = scatterSelectedSale ? [scatterSelectedSale] : [];
+// === NEW ABSOLUTE HTML TOOLTIP OVERLAY ===========================
+    const overlay = document.getElementById("scatter-tooltip-overlay");
+// Clear previous tooltip
+    overlay.innerHTML = "";
 
-    // Width and Height of the HTML tooltip box
-    const TOOLTIP_WIDTH = 200;
-    const TOOLTIP_HEIGHT = 120;
-    const OFFSET_X = 10;
-    const OFFSET_Y = 10;
+    if (scatterSelectedSale) {
+        const d = scatterSelectedSale;
 
-    // Get chart width for boundary check
-    const chartWidth = scatterSVG.node().getBoundingClientRect().width - SCATTER_MARGIN.left - SCATTER_MARGIN.right;
+        // Convert SVG scale coordinates → page coordinates
+        const svgRect = scatterSVG.node().getBoundingClientRect();
+        // Calculate the absolute position: SVG offset + Chart margin + Scaled point position
+        const x = svgRect.left + SCATTER_MARGIN.left + scatterXScale(d.sale_amount);
+        const y = svgRect.top + SCATTER_MARGIN.top + scatterYScale(d.assessed_value);
 
-    const permanentTooltip = scatterChartGroup.selectAll(".permanent-tooltip-group")
-        .data(tooltipData, d => d.serial_number); // Key is crucial here
+        // Build the tooltip element
+        const tooltip = document.createElement("div");
+        tooltip.style.position = "absolute";
+        // ADJUSTMENT: Reduced offset from 5px to 3px
+        tooltip.style.left = `${x - 200}px`;
+        tooltip.style.top = `${y - 100}px`;
+        tooltip.style.width = "200px";
+        tooltip.style.background = "#374151";
+        tooltip.style.border = "1px solid #4b5563";
+        tooltip.style.borderRadius = "6px";
+        tooltip.style.padding = "10px";
+        tooltip.style.color = "white";
+        tooltip.style.fontSize = "12px";
+        tooltip.style.boxShadow = "2px 2px 5px rgba(0,0,0,0.5)";
+        tooltip.innerHTML = `
+        <p style="font-weight: bold; margin-bottom: 5px;">${d.address}</p>
+        <p style="color: #9ca3af; font-size: 0.9em;">${d.town} - ${d.property_type}</p>
+        <p style="color: #60a5fa;">Assessed: ${scatterFormatCurrency(d.assessed_value)}</p>
+        <p style="color: #4ade80;">Sales: ${scatterFormatCurrency(d.sale_amount)}</p>
+        <p style="color: #9ca3af; margin-top: 5px; font-size: 0.75em;">Click point to deselect</p>
+    `;
 
-    permanentTooltip.join(
-        enter => {
-            const group = enter.append("g")
-                .attr("class", "permanent-tooltip-group")
-                .attr("pointer-events", "none")
-                .attr("transform", d => {
-                    // Use log scales for initial position
-                    let x = scatterXScale(d.sale_amount) + OFFSET_X;
-                    let y = scatterYScale(d.assessed_value) - OFFSET_Y;
+        overlay.appendChild(tooltip);
+    }
 
-                    // Boundary check: If the tooltip goes too far right, flip it to the left
-                    if (x + TOOLTIP_WIDTH > chartWidth) {
-                        x = scatterXScale(d.sale_amount) - TOOLTIP_WIDTH - OFFSET_X;
-                    }
-                    // Boundary check: If the tooltip goes too high, flip it down
-                    if (y < 0) {
-                        y = scatterYScale(d.assessed_value) + OFFSET_Y;
-                    }
-
-                    return `translate(${x}, ${y})`;
-                });
-
-            // Inject an HTML div using foreignObject for rich styling
-            group.append("foreignObject")
-                .attr("width", TOOLTIP_WIDTH)
-                .attr("height", TOOLTIP_HEIGHT)
-                .append("xhtml:div")
-                .attr("class", "d3-permanent-tooltip")
-                .style("background-color", "#374151")
-                .style("border", "1px solid #4b5563")
-                .style("padding", "10px")
-                .style("border-radius", "6px")
-                .style("color", "#fff")
-                .style("font-size", "12px")
-                .style("box-shadow", "2px 2px 5px rgba(0,0,0,0.5)")
-                .html(d => `
-                    <p style="font-weight: bold; margin-bottom: 5px;">${d.address}</p>
-                    <p style="color: #9ca3af; font-size: 0.9em;">${d.town} - ${d.property_type}</p>
-                    <p style="color: #60a5fa;">Assessed: ${scatterFormatCurrency(d.assessed_value)}</p>
-                    <p style="color: #4ade80;">Sales: ${scatterFormatCurrency(d.sale_amount)}</p>
-                    <p style="color: #9ca3af; margin-top: 5px; font-size: 0.75em;">Click point to deselect</p>
-                `);
-
-            return group;
-        },
-        update => update
-            .transition().duration(150) // Reduced transition duration for snappier movement
-            .attr("transform", d => {
-                // Use log scales for updated position
-                let x = scatterXScale(d.sale_amount) + OFFSET_X;
-                let y = scatterYScale(d.assessed_value) - OFFSET_Y;
-
-                if (x + TOOLTIP_WIDTH > chartWidth) {
-                    x = scatterXScale(d.sale_amount) - TOOLTIP_WIDTH - OFFSET_X;
-                }
-                if (y < 0) {
-                    y = scatterYScale(d.assessed_value) + OFFSET_Y;
-                }
-                return `translate(${x}, ${y})`;
-            }),
-        exit => exit.remove()
-    );
-};
-
+}; // <--- THIS CLOSES updateScatterPlot() PROPERLY
 
 // --- Legend Functionality (No change) ---
 const drawScatterLegend = (groupedData) => {

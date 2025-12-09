@@ -65,10 +65,21 @@
             stroke: #444;
             opacity: 0.5;
         }
+
+        /* === NEW CSS FOR ABSOLUTE TOOLTIP OVERLAY === */
+        #scatter-tooltip-overlay {
+            position: absolute;
+            pointer-events: none; /* tooltip should not block clicks */
+            z-index: 9999; /* highest layer */
+        }
+        /* =========================================== */
     </style>
 </head>
 <body>
 <div id="dashboard-root">
+
+    <div id="scatter-tooltip-overlay"></div>
+
     <header>
         <div>
             <h1 style="font-size: 1.0rem; font-weight: 700; color: #f97316;">Connecticut Property Sales: Town vs. Market Value Comparison (2021)</h1>
