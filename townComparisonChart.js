@@ -74,7 +74,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
     // Update HTML elements (title and helper text)
     d3.select("#town-comparison-chart-title").text(`Town vs. Market Comparison (${selectedTown || 'All Towns'})`);
     d3.select("#town-info-text").text(selectedTown ? `Comparison for ${selectedTown}` : "Click a point in the scatter plot to select a town and see its comparison line.");
-    d3.select(".legend-town-text-span").text(`${selectedTown || 'Town Name'}`);
+    d3.select(".legend-town-text-span").text(`${selectedTown || 'Town Comparison Line'}`);
 
 
     const svg = container.append("svg")

@@ -318,8 +318,8 @@ const addDumbbellTooltip = (svg, xScale, yScale, chartData) => {
 // --- Legend Drawing ---
 const drawDumbbellLegend = () => {
     const legendData = [
-        { label: 'Avg Assessed', color: '#60a5fa' },
-        { label: 'Avg Sales',   color: '#c084fc' }
+        { label: 'Average Assessed', color: '#60a5fa' },
+        { label: 'Average Sales',   color: '#c084fc' }
         // Selected Point is handled dynamically in updatePropertyTypeDumbbell()
     ];
 
