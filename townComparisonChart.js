@@ -126,14 +126,26 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
         .attr("fill", "#ccc");
 
     // 2. Y-Axis (Sale Value) Formatting
+    // --- START OF Y-AXIS CHANGES ---
+    const Y_TICK_INTERVAL = 500000; // 500K
+
     const formatSaleValue = (d) => {
         const num = d.valueOf();
-        return d3.format("$.1s")(num).replace(/G/, "B").replace(/k/, "K");
+        // Use d3.format("$.1f")(num / 1000000) + "M" for forced decimal like $0.5M
+        if (num >= 1000000) {
+            return d3.format("$.1f")(num / 1000000) + "M";
+        }
+        if (num > 0) {
+            return d3.format("$.0f")(num / 1000) + "K";
+        }
+        return '$0';
     };
 
     const yAxis = d3.axisLeft(yScale)
-        .ticks(10)
+        // Use d3.range to create tick values incrementing by 500K
+        .tickValues(d3.range(0, maxSaleValue + Y_TICK_INTERVAL, Y_TICK_INTERVAL))
         .tickFormat(formatSaleValue);
+    // --- END OF Y-AXIS CHANGES ---
 
     chartGroup.append("g")
         .call(yAxis)
@@ -171,7 +183,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
     chartGroup.append("path")
         .datum(allDataAggregated)
         .attr("fill", "none")
-        .attr("stroke", "#b96a10") // CHANGE 1: cornflowerblue -> #f97316 (Orange)
+        .attr("stroke", "#f97316") // CHANGE 1: cornflowerblue -> #f97316 (Orange)
         .attr("stroke-width", 2)
         .attr("d", lineGenerator);
 
@@ -211,6 +223,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
 
             // Draw selected point if coordinates are valid
             if (isFinite(xPos) && isFinite(yPos)) {
+                // NOTE: SCATTER_COLORS is not defined in this snippet but is assumed global/imported.
                 chartGroup.append("circle")
                     .attr("cx", xPos)
                     .attr("cy", yPos)
@@ -225,6 +238,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
         }
 
         // --- Update Legend for Selected Point ---
+        // NOTE: SCATTER_COLORS is not defined in this snippet but is assumed global/imported.
         const selColor = SCATTER_COLORS[currentSelectedSale.property_type];
 
         d3.select("#selected-point-legend")
@@ -245,6 +259,7 @@ function renderTownComparisonChart(containerSelector, data, currentSelectedSale)
 
 // --- Global Initialization/Update Functions (Required by index.js) ---
 function initializeTownComparisonChart(data, currentSelectedSale) {
+    // NOTE: '#town-comparison-chart-container' must exist in the HTML.
     renderTownComparisonChart('#town-comparison-chart-container', data, currentSelectedSale);
 }
 
