@@ -97,7 +97,7 @@ const initializePropertyTypeDumbbell = (data, selectedSale) => {
     const xAxis = d3.axisBottom(dumbbellXScale);
 
     dumbbellChartGroup.append("g").attr("class", "y-axis").call(yAxis).selectAll("text").attr("fill", "#ccc");
-    dumbbellChartGroup.append("g").attr("class", "x-axis").attr("transform", `translate(0, ${DUMBBELL_HEIGHT})`).call(xAxis).selectAll("text").attr("fill", "#ccc").style("text-anchor", "end").attr("transform", "rotate(0)");
+    dumbbellChartGroup.append("g").attr("class", "x-axis").attr("transform", `translate(0, ${DUMBBELL_HEIGHT})`).call(xAxis).selectAll("text").attr("fill", "#ccc").style("text-anchor", "middle").attr("transform", "rotate(0)");
 
     // --- AXIS TITLES ---
     dumbbellChartGroup.append("text")
