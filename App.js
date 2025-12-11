@@ -5,7 +5,7 @@ let salesData = [];
 let selectedSale = null;
 
 // --- API Endpoint and Data Source ---
-const DATA_SOURCE_FILE = "test2.json";
+const DATA_SOURCE_FILE = "Data.json";
 
 // --- Utility Functions (Simulating the App component's methods) ---
 
@@ -71,7 +71,7 @@ const initializeDashboard = () => {
     }).catch(err => {
         console.error("Critical error loading JSON data:", err);
         // Display a user-friendly error message on the page
-        d3.select("#dashboard-root").html('<div style="color: red; padding: 20px;">Error loading dashboard data. Please check "test2.json".</div>');
+        d3.select("#dashboard-root").html('<div style="color: red; padding: 20px;">Error loading dashboard data. Please check "Data.json".</div>');
     });
 };
 

@@ -5,7 +5,7 @@ let salesData = [];
 let selectedSale = null;
 
 // --- API Endpoint and Data Source ---
-const DATA_SOURCE_FILE = "test2.json";
+const DATA_SOURCE_FILE = "Data.json";
 const SAMPLE_SIZE = 100000; // Limit the data points to 15,000 for performance
 
 // --- Utility Functions (Simulating the App component's methods) ---
@@ -50,7 +50,7 @@ const initializeDashboard = () => {
     d3.json(DATA_SOURCE_FILE).then(data => {
         if (!data || data.length === 0) {
             console.error(`Error: Could not load data from ${DATA_SOURCE_FILE}.`);
-            d3.select("#dashboard-root").html('<div style="color: red; padding: 20px;">Error loading dashboard data. Please check "test2.json" and ensure a local server is running.</div>');
+            d3.select("#dashboard-root").html('<div style="color: red; padding: 20px;">Error loading dashboard data. Please check "Data.json" and ensure a local server is running.</div>');
             return;
         }
 
@@ -93,7 +93,7 @@ const initializeDashboard = () => {
 
     }).catch(err => {
         console.error("Critical error loading JSON data:", err);
-        d3.select("#dashboard-root").html('<div style="color: red; padding: 20px;">Error loading dashboard data. Please check "test2.json" and ensure a local server is running.</div>');
+        d3.select("#dashboard-root").html('<div style="color: red; padding: 20px;">Error loading dashboard data. Please check "Data.json" and ensure a local server is running.</div>');
     });
 };
 

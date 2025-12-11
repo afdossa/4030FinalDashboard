@@ -1,38 +1,78 @@
-# Using forces in D3
+https://afdossa.github.io/4030FinalDashboard/
 
-The scope of this exercise is to play with forces and force directed layout to creat networks and trees visualizations.
+# D3 Connecticut Property Sales Dashboard (2021)
+=====================================================
 
-### Step 1 
+## Overview
 
-In the following chart we are using forces on simple objects. Right now, bubbles' positions is adjusted using forceCenter() while forceCollide() assumes all circles have radius 10.
-Change the function in `PropertyTypeDumbbell.js` in order to set a different force based on the bubble radius. The intended result is having no bubbles intersecting each other.
+This project is a dynamic, multi-view data visualization dashboard built using vanilla JavaScript and the D3.js library. It is designed to analyze and compare property sales data from Connecticut for the year 2021, focusing on the relationship between official **Assessed Value** and the final **Sale Amount**.
 
-Once you are satisfied with the result update your code on Github and add a screenshot of your result directly on the repository.
+The dashboard features three interconnected charts that share a global state, allowing users to drill down into a single property sale and see its context across all visualizations.
 
-### Step 2
+## Features
 
-Uncomment the line `<!-- <script src="App.js"></script> -->` from your `index.html` file and open `App.js`.
-Here you will have to draw a network using a force directed layout. As a first step, read the information about your graph from the file `miserables.json`.
-Then, update the code following the `TODO` instructions.
+1.  **Sales vs. Assessment Scatter Plot:** Displays every sales record, comparing `Assessed Value` (X-axis) against `Sale Amount` (Y-axis), color-coded by `Property Type`.
+    * **Interactivity:** Allows filtering by property type via the legend and selecting an individual data point to highlight it globally.
+2.  **Property Type Dumbbell Chart:** Compares the **Average Assessed Value** versus the **Average Sale Amount** for different property categories (e.g., Residential, Commercial).
+3.  **Town Comparison Trend Line:** Analyzes the average sales price trend across different assessed value brackets ($200k bins) for all towns, with a dynamic line to highlight the trend for a **selected town**.
 
-Once you are satisfied with the result update your code on Github and add a screenshot of your result directly on the repository.
+## Data Acquisition and Processing
 
-### Step 3
+The application uses a static JSON file (`Data.json`) as its data source. The data represents property sales records for the year 2021.
 
-Uncomment the line `<!-- <script src="townComparisonChart.js"></script> -->` from your `index.html` file and open `townComparisonChart.js`.
-Here we are trying to draw a very small hiearchy starting from a given dataset already stored in the variable `family`.
+### Data Cleaning Pipeline (`index.js`)
 
-Take a look at the dataset first. You will notice a clear paret-child relationship which should appear in our tree visualization.
+To ensure data quality and accurate visualization, the raw data undergoes strict filtering upon load (defined in the `cleanData` function in `index.js`):
 
-- Study the function `d3.hierarchy` from the API and process the hierarhcy of nodes. 
+1.  **Type Conversion:** `sale_amount`, `assessed_value`, and `sales_ratio` fields are converted to numeric types.
+2.  **Minimum Sale Filter:** Records with a `sale_amount` less than **$10,000** are removed to exclude non-market or administrative transfers.
+3.  **Sales Ratio Outlier Removal:** Records with an extreme `sales_ratio` (the ratio of assessed value to sale amount) are removed:
+    * Filter: `sales_ratio` must be between **0.05 (5%)** and **5.0 (500%)**.
+4.  **Data Sampling:** For performance optimization, the application loads a maximum of **100,000 records** from the cleaned dataset.
 
-- create a new variable called `root` storing the result of calling `d3.hierarchy` on `family`. Once you run the function, study the accessors that have been generated and are now stored in root. These will simplify the access to some entity of your hierarchy like, for example (links, or the descendents)
+## Project Structure
 
-- Study the function `d3.tree` from the API. Generally, you can create a tree layout in two ways. By setting the tree size (with `.size([width,height]`)) which specifices the size for the overall layout, or, by setting the distance between each layer in the hierarchy (`.nodeSize[xd,yd]`). Play with both functions once the final hierarchy is visualized to see how the tree layout changes.
+| File | Description |
+| :--- | :--- |
+| `index.html` | The main entry point. Loads all scripts and defines the HTML structure/containers for the dashboard. |
+| `Data.json` | The raw, static JSON dataset used by the application. |
+| **`index.js`** | **The Controller:** Manages the global application state (`salesData`, `selectedSale`). Handles data loading, cleaning, and the core event loop (`handlePointClick`) that synchronizes updates across all chart files. |
+| `scatterPlot.js` | D3 script for rendering the primary scatter plot visualization and handling its local interactivity. |
+| `propertyTypeDumbbell.js` | D3 script for aggregating data by `property_type` and rendering the comparison dumbbell chart. |
+| `townComparisonChart.js` | D3 script for aggregating and rendering the sales trend comparison chart. |
+| `package.json` | Defines project dependencies, primarily for running a local server (`serve`). |
 
-- Complete the reamining code following the `TODO` comments
+## Getting Started
 
+This project is a static front-end application and requires a local web server to run due to browser restrictions on loading local files (`d3.json` cannot load `Data.json` directly without a server).
 
-Once you are satisfied with the result update your code on Github and add a screenshot of your result directly on the repository.
+### Prerequisites
 
-As a final submission, upload on Gradescope the three visualizations obtained plus the javascript files you have modified.
+You need Node.js and npm (or yarn) installed on your system.
+
+### Local Installation
+
+1.  **Clone or Download:**
+    ```bash
+    git clone [https://github.com/afdossa/4030FinalDashboard.git](https://github.com/afdossa/4030FinalDashboard.git)
+    cd 4030FinalDashboard
+    ```
+2.  **Install Dependencies:**
+    ```bash
+    npm install
+    ```
+    This installs the simple local server dependency, `serve`.
+3.  **Start the Dashboard:**
+    ```bash
+    npm start
+    ```
+    This command runs the `serve` tool, which typically starts the server on `http://localhost:3000` or an available port.
+
+The dashboard will open in your browser, loading the `index.html` file and starting the data loading process defined in `index.js`.
+
+## Technologies
+
+* **D3.js (v7+):** Core library for data-driven document manipulation and visualization.
+* **JavaScript (ES6):** Primary language for application logic and state management.
+* **HTML5 / CSS3:** Structure and basic styling.
+* **`serve`:** Simple command-line utility for serving static content locally.
